@@ -15,4 +15,18 @@ describe('tip', function() {
     it('parses float literals', function() {
 	tip.parse('30.01')[0].should.eql({ type: 'number', value: '30.01'})
     })
+
+    it('parses operator expressions', function() {
+	tip.parse('a * b')[0].operation.should.eql('*')
+    })
+
+    describe('interfaces', function() {
+	it('parses class public interface', function() {
+	    tip.parse('class A { public k }')[0].interfaces[0].visibility.should.eql('public')
+	})
+
+	it('parses class private interface', function() {
+	    tip.parse('class A { k }')[0].interfaces[0].visibility.should.eql('private')
+	})
+    })
 })
