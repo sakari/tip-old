@@ -3,4 +3,8 @@ stringvar = "aouea"
 fun() {}
 numvar + 3
 lambda = () {}
-class Classy {}
+class Classy {
+      public a() {}
+      b() {}
+      identifier
+}
