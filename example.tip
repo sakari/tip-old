@@ -1,0 +1,4 @@
+numvar = 1
+stringvar = "aouea"
+fun() {}
+class Classy {}
