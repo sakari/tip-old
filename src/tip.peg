@@ -15,10 +15,11 @@ arguments = expression (',' arguments)*
 expression = ws (application / assingment / operation / terminal / parenthesis / lambda) ws
 application = terminal '(' arguments? ')'
 assingment = terminal '=' expression
-operation = terminal '+' expression
+operation = terminal operation expression
 parenthesis = '(' expression ')'
 terminal = literal / identifier
 lambda = '(' parameters* ')' ws '{' statement* '}'
+operation = [.\-+*%/]+
 
 ws = [ \n\t]*
 literal = ws (number / string) ws
