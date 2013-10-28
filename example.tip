@@ -1,4 +1,6 @@
 numvar = 1
 stringvar = "aouea"
 fun() {}
+numvar + 3
+lambda = () {}
 class Classy {}

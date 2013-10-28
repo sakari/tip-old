@@ -12,12 +12,13 @@ class = 'class' identifier '{' statement* '}'
 
 arguments = expression (',' arguments)*
 
-expression = ws (application / assingment / operation / terminal / parenthesis) ws
+expression = ws (application / assingment / operation / terminal / parenthesis / lambda) ws
 application = terminal '(' arguments? ')'
 assingment = terminal '=' expression
 operation = terminal '+' expression
 parenthesis = '(' expression ')'
 terminal = literal / identifier
+lambda = '(' parameters* ')' ws '{' statement* '}'
 
 ws = [ \n\t]*
 literal = ws (number / string) ws
