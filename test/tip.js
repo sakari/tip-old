@@ -8,6 +8,11 @@ describe('tip', function() {
 	tip = new Tip()
     })
     it('parses the example file', function() {
-	tip.parse(fs.readFileSync('example.tip', 'utf8'))
+	console.log(JSON.stringify(
+	    tip.parse(fs.readFileSync('example.tip', 'utf8')), null, 4))
+    })
+
+    it('parses float literals', function() {
+	tip.parse('30.01')[0].should.eql({ type: 'number', value: '30.01'})
     })
 })

@@ -1,28 +1,28 @@
 start = statement+
-statement = ws (function / type / expression) ws
+statement = ws s:(function / type / expression) ws { return s }
 
-function = identifier '(' parameters? ')' ws '{' statement* '}' ws
-parameters = parameter (',' parameters)*
+function = i:identifier '(' p:parameters? ')' ws '{' body:statement* '}' ws { return { type: 'function', parameters: p, body: body, name: i} }
+parameters = p:parameter (',' ps:parameters)* { return [p].concat[ps] }
 parameter = identifier
 
-identifier = ws ([a-zA-Z_$][a-zA-Z_0-9$]*) ws
+identifier = ws i:[a-zA-Z_$] is:[a-zA-Z_0-9$]* ws { return { type: 'identifier', name: i + is.join('')} }
 
 type = class
-class = 'class' identifier '{' interface* '}'
-interface = ('public')? (function / identifier)
+class = 'class' i:identifier '{' ifs:interface* '}' { return { type: 'class', name: 'i', interfaces: ifs }}
+interface = p:('public')? i:(function / identifier) { return { public: p, interface: i}}
 
-arguments = expression (',' arguments)*
+arguments = e:expression (',' args:arguments)* { return [e].concat([args]) }
 
-expression = ws (application / assingment / operation / terminal / parenthesis / lambda) ws
-application = terminal '(' arguments? ')'
-assingment = terminal '=' expression
-operation = terminal operation expression
-parenthesis = '(' expression ')'
+expression = ws e:(application / assingment / operation / terminal / parenthesis / lambda) ws { return e }
+application = t:terminal '(' args:arguments? ')' { return { type: 'application', callee: t, arguments: args }}
+assingment = t:terminal '=' e:expression { return { type: 'assingment', lhs: t, rhs: e }}
+operation = lhs: terminal op:operation rhs:expression { return { type: 'operation', lhs: lhs, rhs: rhs, operation: op }}
+parenthesis = '(' e:expression ')' { return { type: 'parenthesis', expression: e }}
 terminal = literal / identifier
-lambda = '(' parameters* ')' ws '{' statement* '}'
+lambda = '(' ps:parameters* ')' ws '{' body:statement* '}' { return { type: 'function', parameters:ps, body: body }}
 operation = [.\-+*%/]+
 
 ws = [ \n\t]*
-literal = ws (number / string) ws
-number = [0-9]+ ('.' [0-9]+)?
-string = '"' [^"]* '"'
+literal = ws lit:(number / string) ws { return lit }
+number = v:[0-9]+ vs:('.' [0-9]+)? { return { type: 'number', value: v.concat(vs ? '.' + vs[1].join('') : []).join('') }}
+string = '"' string:([^"]*) '"' { return { type: 'string', value: string.join('') }}
