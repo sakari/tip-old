@@ -12,8 +12,14 @@ describe('tip', function() {
 	    tip.parse(fs.readFileSync('example.tip', 'utf8')), null, 4))
     })
 
-    it('parses float literals', function() {
-	tip.parse('30.01')[0].should.eql({ type: 'number', value: '30.01'})
+    describe('literals', function() {
+	it('parses float literals', function() {
+	    tip.parse('30.01')[0].should.eql({ type: 'number', value: '30.01'})
+	})
+
+	it('parses string literals', function() {
+	    tip.parse('"aa aa"')[0].should.eql({ type: 'string', value: 'aa aa'})
+	})
     })
 
     it('parses operator expressions', function() {
