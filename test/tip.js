@@ -12,6 +12,19 @@ describe('tip', function() {
 	    tip.parse(fs.readFileSync('example.tip', 'utf8')), null, 4))
     })
 
+    describe('variables', function() {
+	it('parses var', function() {
+	    tip.parse('var a')[0]
+		.should.eql({ type: 'var', name: 'a'});
+	})
+
+	it('allows assinging vars', function() {
+	    tip.parse('var a = 1')[0]
+		.assingment
+		.should.eql({ type: 'number', value: '1' })
+	})
+    })
+
     describe('literals', function() {
 	it('parses float literals', function() {
 	    tip.parse('30.01')[0].should.eql({ type: 'number', value: '30.01'})
@@ -39,6 +52,7 @@ describe('tip', function() {
 		.should.eql("aa")
 	})
     })
+
 
     it('parses operator expressions', function() {
 	tip.parse('a * b')[0].operation.should.eql('*')

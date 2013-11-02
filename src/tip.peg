@@ -1,6 +1,12 @@
 start = statement+
-statement = ws s:(function / type / expression) ws
+statement = ws s:(var / function / type / expression ) ws
 	  { return s }
+
+var = 'var' s:symbol a:varAssingment?
+    { var r = { type: 'var', name: s }; if(a !== '') r.assingment = a; return r }
+
+varAssingment = '=' e:expression
+	      { return e }
 
 function = i:identifier p:parameterList body:block
 	 { return { type: 'function', parameters: p, body: body, name: i} }
