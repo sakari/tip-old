@@ -8,8 +8,22 @@ var = 'var' s:symbol t:type? a:varAssingment?
 type = ':' ws t:typeExpression ws
      { return t }
 
-typeExpression = s:symbol a:typeArguments?
-	       { return { constructor: s, args: a === '' ? [] : a }}
+typeExpression = typeConstructor / typeStruct
+
+typeStruct = '{' t:typeFields? '}'
+	   { return { type: 'structType', fields: t } }
+
+typeFields = t:typeField ts:typeFieldTail*
+	   { return [t].concat(ts) }
+
+typeFieldTail = ',' t:typeField
+	      { return t }
+
+typeField =  k:key ':' t:typeExpression
+	  { return { key: k, value: t }}
+
+typeConstructor = s:symbol a:typeArguments?
+	       { return { type: 'constructorType', constructor: s, args: a === '' ? [] : a }}
 
 typeArguments = '<' t:typeExpression ts:typeArgumentTail* '>'
 	 { return [t].concat(ts) }

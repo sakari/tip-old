@@ -27,16 +27,30 @@ describe('tip', function() {
     })
 
     describe('type expressions', function() {
-	it('parses simple', function() {
+	it('parses constructor', function() {
 	    tip.parse('var a : number')[0].typeExpression
-		.should.eql({ constructor: 'number', args: [] })
+		.should.eql({
+		    type: 'constructorType', constructor: 'number', args: []
+		})
 	})
 
 	it('parses type expression with arguments', function() {
 	    tip.parse('var a : k<p>')[0].typeExpression
-		.should.eql({ constructor: 'k', args: [{constructor: 'p', args: []}]})
+		.should.eql({
+		    type: 'constructorType',
+		    constructor: 'k',
+		    args: [{type: 'constructorType', constructor: 'p', args: []}]
+		})
 	})
 
+	it('parses struct types', function() {
+	    tip.parse('var a: { k : z }')[0].typeExpression
+		.should.eql({ type: 'structType'
+			      , fields: [{
+				  key: 'k',
+				  value: { type: 'constructorType', constructor: 'z', args: []}
+			      }]})
+	})
     })
 
     describe('literals', function() {
