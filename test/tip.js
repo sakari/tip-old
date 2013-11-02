@@ -127,8 +127,18 @@ describe('tip', function() {
 		})
 	})
 
+	it('parses identifier assingment', function() {
+	    tip.parse('a = p')[0].rhs.name.should.eql('p')
+	})
+
 	it('can index expressions', function() {
-	    tip.parse('var k = a[2][1]')[0].should.eql('1')
+	    tip.parse('var k = a[2][1]')[0].assingment.index.value.should.eql('1')
+	})
+
+	it('can call applications', function() {
+	    tip.parse('a()()')[0]
+		.callee.callee.name
+		.should.eql('a')
 	})
     })
 

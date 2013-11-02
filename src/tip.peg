@@ -79,23 +79,35 @@ arguments = e:expression args:argumentTail*
 argumentTail = ',' e:expression
 	     { return e }
 
-expressionStatement = ws e:(application / assingment) ws
-		    { return e }
+expressionStatement = ws a:(terminal / parenthesis) o:expressionOp* ws
+	   { var c = a; o.forEach(function(f) { c = f(c) }); return c }
 
-expression = ws e:(application / assingment / index / operation / terminal / parenthesis / lambda / array / struct) ws
-	   { return e }
+application = t:expressionAtom '(' args:arguments? ')'
+	    { return { type: 'application', callee: t, arguments: args }}
 
-index = t:terminal '[' e:expression ']'
-      { return { type: 'index', lhs: t, index: e }}
+assingment = t:(expressionAtom / application) '=' e:expression
+	   { return { type: 'assingment', lhs: t, rhs: e }}
 
-application = t:terminal '(' args:arguments? ')'
-	    { return { type: 'application', callee: t, arguments: args }}
+expressionOp = ws f:(opApplication / opAssingment / index / operation) ws
+	     { return f }
 
-assingment = t:terminal '=' e:expression
-	   { return { type: 'assingment', lhs: t, rhs: e }}
+opApplication = '(' args:arguments? ')'
+	      { return function(t) { return { type: 'application', callee: t, arguments: args }} }
 
-operation = lhs: terminal op:op rhs:expression
-	  { return { type: 'operation', lhs: lhs, rhs: rhs, operation: op }}
+opAssingment = '=' e:expression
+	     { return function(lhs) { return { type: 'assingment', lhs: lhs, rhs: e }}}
+
+expression = a:expressionAtom o:expressionOp*
+	   { var c = a; o.forEach(function(f) { c = f(c) }); return c }
+
+expressionAtom = ws a:(terminal / parenthesis / array / struct / lambda) ws
+	       { return a }
+
+index = '[' e:expression ']'
+      { return function(lhs) { return { type: 'index', lhs: lhs, index: e }}}
+
+operation = op:op rhs:expression
+	  { return function(lhs) {return { type: 'operation', lhs: lhs, rhs: rhs, operation: op }}}
 
 parenthesis = '(' e:expression ')'
 	    { return { type: 'parenthesis', expression: e }}
