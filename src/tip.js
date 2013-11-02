@@ -10,7 +10,7 @@ function Tip() {
 }
 
 Tip.prototype.parse = function(str) {
-    return this._parser.parse(str)
+    return this._parser.parse(str + '\n')
 }
 
 module.exports = Tip

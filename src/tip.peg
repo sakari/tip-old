@@ -1,11 +1,11 @@
 start = statement+
-statement = ws s:(var / function / class / expressionStatement ) ws
+statement = ws s:(var / function / class / expression ) linechange
 	  { return s }
 
 var = 'var' s:symbol t:type? a:varAssingment?
     { return { type: 'var', name: s, typeExpression: t, assingment: a } }
 
-type = ':' ws t:typeExpression ws
+type = ':' ws t:typeExpression space
      { return t }
 
 typeExpression = typeConstructor / typeStruct / typeFunction
@@ -46,7 +46,7 @@ varAssingment = '=' e:expression
 function = i:symbol p:parameterList body:block
 	 { return { type: 'function', parameters: p, body: body, name: i} }
 
-block = ws '{' s:statement* '}' ws
+block = ws '{' s:statement* '}' space
       { return s }
 
 parameterList = '(' p:parameters? ')'
@@ -61,7 +61,7 @@ parameterListTail = ',' p:parameter
 parameter = s:symbol t:type?
 	  { return { type: 'parameter', symbol: s, typeExpression: t === '' ? undefined : t } }
 
-symbol = ws i:[a-zA-Z_$] is:[a-zA-Z_0-9$]* ws
+symbol = ws i:[a-zA-Z_$] is:[a-zA-Z_0-9$]* space
        { return i + is.join('')}
 
 identifier = s:symbol
@@ -79,16 +79,7 @@ arguments = e:expression args:argumentTail*
 argumentTail = ',' e:expression
 	     { return e }
 
-expressionStatement = ws a:(terminal / parenthesis) o:expressionOp* ws
-	   { var c = a; o.forEach(function(f) { c = f(c) }); return c }
-
-application = t:expressionAtom '(' args:arguments? ')'
-	    { return { type: 'application', callee: t, arguments: args }}
-
-assingment = t:(expressionAtom / application) '=' e:expression
-	   { return { type: 'assingment', lhs: t, rhs: e }}
-
-expressionOp = ws f:(opApplication / opAssingment / index / operation) ws
+expressionOp = ws f:(opApplication / opAssingment / index / operation) space
 	     { return f }
 
 opApplication = '(' args:arguments? ')'
@@ -100,7 +91,7 @@ opAssingment = '=' e:expression
 expression = a:expressionAtom o:expressionOp*
 	   { var c = a; o.forEach(function(f) { c = f(c) }); return c }
 
-expressionAtom = ws a:(terminal / parenthesis / array / struct / lambda) ws
+expressionAtom = ws a:(terminal / parenthesis / array / struct / lambda) space
 	       { return a }
 
 index = '[' e:expression ']'
@@ -122,6 +113,9 @@ op = o:[.\-+*%/]+
 
 ws = [ \n\t]*
 
+space = [ \t]*
+linechange = space '\n' ws
+
 struct = '{' f:fields? '}'
        { return { type: 'struct', value: f ? f : [] } }
 
@@ -142,7 +136,7 @@ array = '[' e:expression es:expressionTail* ']'
 expressionTail = ',' e:expression
 	       { return e }
 
-literal = ws lit:(number / string) ws
+literal = ws lit:(number / string) space
 	{ return lit }
 
 number = v:[0-9]+ vs:('.' [0-9]+)?
@@ -151,5 +145,5 @@ number = v:[0-9]+ vs:('.' [0-9]+)?
 string = s:stringSymbol
        { return { type: 'string', value: s }}
 
-stringSymbol = ws '"' s:([^"]*) '"' ws
+stringSymbol = ws '"' s:([^"]*) '"' space
 	     { return s.join('') }
