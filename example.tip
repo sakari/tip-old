@@ -1,7 +1,7 @@
 numvar = 1
 stringvar = "aouea"
 fun() {}
-numvar + 30.11
+var p = numvar + 30.11
 lambda = () {}
 class Classy {
       public a() {}

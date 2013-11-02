@@ -81,43 +81,54 @@ describe('tip', function() {
 
     describe('literals', function() {
 	it('parses float literals', function() {
-	    tip.parse('30.01')[0].should.eql({ type: 'number', value: '30.01'})
+	    tip.parse('var a = 30.01')[0].assingment
+		.should.eql({ type: 'number', value: '30.01'})
 	})
 
 	it('parses string literals', function() {
-	    tip.parse('"aa aa"')[0].should.eql({ type: 'string', value: 'aa aa'})
+	    tip.parse('var k = "aa aa"')[0].assingment
+		.should.eql({ type: 'string', value: 'aa aa'})
 	})
 
 	it('parses array constructor', function() {
-	    tip.parse('[a, 2]')[0].should.eql({ type: 'array',
-						value: [{ type: 'identifier', name: 'a' }
-							, {type: 'number', value: '2'}
-						       ]})
+	    tip.parse('var a = [a, 2]')[0].assingment
+		.should.eql({ type: 'array',
+			      value: [{ type: 'identifier', name: 'a' }
+				      , {type: 'number', value: '2'}
+				     ]})
 	})
 
 	it('parses structures', function() {
-	    tip.parse('{ a: 1}')[0]
+	    tip.parse('var a = { a: 1}')[0].assingment
 		.should.eql({ type: 'struct'
 			      , value: [ { key:  'a', value: { type: 'number', value: '1'}} ]})
 	})
 
 	it('parses structures with string keys', function() {
-	    tip.parse('{ "aa": 1}')[0].value[0].key
+	    tip.parse('var a = { "aa": 1}')[0].assingment
+		.value[0].key
 		.should.eql("aa")
 	})
     })
 
     describe('expressions', function() {
 	it('parses operator expressions', function() {
-	    tip.parse('a * b')[0].operation.should.eql('*')
+	    tip.parse('var k = a * b')[0]
+		.assingment
+		.operation.should.eql('*')
 	})
 
 	it('parses index operators', function() {
-	    tip.parse('a[1]')[0].should.eql({
-		type: 'index',
-		lhs: { type: 'identifier', name: 'a' },
-		index: { type: 'number', value: '1'}
-	    })
+	    tip.parse('var p = a[1]')[0].assingment
+		.should.eql({
+		    type: 'index',
+		    lhs: { type: 'identifier', name: 'a' },
+		    index: { type: 'number', value: '1'}
+		})
+	})
+
+	it('can index expressions', function() {
+	    tip.parse('var k = a[2][1]')[0].should.eql('1')
 	})
     })
 

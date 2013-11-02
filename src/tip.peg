@@ -1,5 +1,5 @@
 start = statement+
-statement = ws s:(var / function / class / expression ) ws
+statement = ws s:(var / function / class / expressionStatement ) ws
 	  { return s }
 
 var = 'var' s:symbol t:type? a:varAssingment?
@@ -78,6 +78,9 @@ arguments = e:expression args:argumentTail*
 
 argumentTail = ',' e:expression
 	     { return e }
+
+expressionStatement = ws e:(application / assingment) ws
+		    { return e }
 
 expression = ws e:(application / assingment / index / operation / terminal / parenthesis / lambda / array / struct) ws
 	   { return e }
