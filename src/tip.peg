@@ -52,7 +52,7 @@ varAssingment = '=' e:expression
 function = i:symbol l:lambda
 	 { l.name = i; return l }
 
-block = ws '{' s:statement* '}' space
+block = ws '{' s:statement*  ws '}' space
       { return s }
 
 parameterList = '(' p:parameters? ')'
@@ -73,8 +73,8 @@ symbol = ws i:[a-zA-Z_$] is:[a-zA-Z_0-9$]* space
 identifier = s:symbol
 	   { return { type: 'identifier', name: s } }
 
-class = 'class' i:symbol '{' ifs:interface* '}'
-      { return { type: 'class', name: 'i', interfaces: ifs }}
+class = ws 'class' i:symbol '{' ifs:interface* '}'
+      { return { type: 'class', name: i, interfaces: ifs }}
 
 interface = ws p:('public')? i:(function / identifier) ws
 	  { return { visibility: p ? 'public' : 'private', interface: i}}
@@ -94,10 +94,15 @@ opApplication = '(' args:arguments? ')'
 opAssingment = '=' e:expression
 	     { return function(lhs) { return { type: 'assingment', lhs: lhs, rhs: e }}}
 
-expression = a:expressionAtom o:expressionOp*
+expression = expressionNew / expressionPlain
+
+expressionNew = ws 'new' ws e:expressionPlain space
+	      { return { type: 'new', expression: e } }
+
+expressionPlain = a:expressionAtom o:expressionOp*
 	   { var c = a; o.forEach(function(f) { c = f(c) }); return c }
 
-expressionAtom = ws a:(terminal / parenthesis / array / struct / lambda) space
+expressionAtom = ws a:(terminal / parenthesis / array / struct / lambda ) space
 	       { return a }
 
 index = '[' e:expression ']'

@@ -10,8 +10,14 @@ function Tip() {
 	, { trackLineAndColumn: true })
 
     this.templates = {}
-    this.templates['function'] = handlebars.compile(
-	fs.readFileSync('templates/function.js', 'utf8'))
+    this.readTemplate('function')
+    this.readTemplate('class')
+}
+
+
+Tip.prototype.readTemplate = function(template) {
+    this.templates[template] = handlebars.compile(
+	fs.readFileSync('templates/' + template + '.js', 'utf8'))
 }
 
 Tip.prototype.parse = function(str) {
@@ -23,10 +29,12 @@ Tip.prototype.compile = function(str) {
     var transpiled = this.parse(str).map(function(statement) {
 	return self.transpileStatement(statement)
     }).join('\n')
+    console.log('>>>', transpiled)
     return transpiled
 }
 
 Tip.prototype.transpileStatement = function(ast) {
+    var self = this
     if(ast.type === 'function') {
 	return this.templates['function']({
 	    name: ast.name,
@@ -35,6 +43,28 @@ Tip.prototype.transpileStatement = function(ast) {
 	    type: ast.typeExpression
 	})
     }
+
+    if(ast.type === 'class') {
+	return this.templates['class']({
+	    name: ast.name,
+	    methods: ast.interfaces.filter(function(i) {
+		return i.interface.type === 'function'
+	    }).map(function(i) {
+		i = i.interface
+		return {
+		    name: i.name,
+		    parameters: i.parameters.map(
+			function(p) {
+			    return p.symbol
+			}).join(', '),
+		    body: i.body.map(function(s) {
+			return self.transpileStatement(s)
+		    }).join('\n')
+		}
+	    })
+	})
+    }
+
     if(ast.type === 'return') {
 	return 'return ' + this.transpileExpression(ast.value)
     }
@@ -45,6 +75,10 @@ Tip.prototype.transpileStatement = function(ast) {
 Tip.prototype.transpileExpression = function(ast) {
     if(!ast || ast === '' || ast === undefined )
 	throw new Error('undefined ast: ' + JSON.stringify(ast, null, 4))
+
+    if(ast.type === 'new') {
+	return 'new ' + this.transpileExpression(ast.expression)
+    }
 
     if(ast.type === 'identifier') {
 	return ast.name
