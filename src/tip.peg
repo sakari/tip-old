@@ -79,8 +79,11 @@ arguments = e:expression args:argumentTail*
 argumentTail = ',' e:expression
 	     { return e }
 
-expression = ws e:(application / assingment / operation / terminal / parenthesis / lambda / array / struct) ws
+expression = ws e:(application / assingment / index / operation / terminal / parenthesis / lambda / array / struct) ws
 	   { return e }
+
+index = t:terminal '[' e:expression ']'
+      { return { type: 'index', lhs: t, index: e }}
 
 application = t:terminal '(' args:arguments? ')'
 	    { return { type: 'application', callee: t, arguments: args }}

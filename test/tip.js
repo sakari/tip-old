@@ -107,11 +107,17 @@ describe('tip', function() {
 	})
     })
 
-
-
     describe('expressions', function() {
 	it('parses operator expressions', function() {
 	    tip.parse('a * b')[0].operation.should.eql('*')
+	})
+
+	it('parses index operators', function() {
+	    tip.parse('a[1]')[0].should.eql({
+		type: 'index',
+		lhs: { type: 'identifier', name: 'a' },
+		index: { type: 'number', value: '1'}
+	    })
 	})
     })
 
