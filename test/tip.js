@@ -91,6 +91,10 @@ describe('tip', function() {
 		.should.eql({ type: 'string', value: 'aa aa'})
 	})
 
+	it('parses string literals with single quotes', function() {
+	    tip.parse("'aa'")[0].value.should.eql('aa')
+	})
+
 	it('parses array constructor', function() {
 	    tip.parse('var a = [a, 2]')[0].assingment
 		.should.eql({ type: 'array',

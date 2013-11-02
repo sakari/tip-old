@@ -148,5 +148,10 @@ number = v:[0-9]+ vs:('.' [0-9]+)?
 string = s:stringSymbol
        { return { type: 'string', value: s }}
 
-stringSymbol = ws '"' s:([^"]*) '"' space
+stringSymbol = ws s:(stringDoubleQuotes / stringSingleQuotes) space
 	     { return s.join('') }
+
+stringDoubleQuotes = '"' s:([^"]*) '"'
+		   { return s }
+stringSingleQuotes = "'" s:([^']*) "'"
+		   { return s }
