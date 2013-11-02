@@ -31,6 +31,7 @@ describe('tip', function() {
 	    tip.parse('fun(a) {}')[0]
 		.should.eql({
 		    type: 'function',
+		    typeExpression: undefined,
 		    parameters: [{ type: 'parameter', symbol: 'a', typeExpression: undefined}],
 		    body: [],
 		    name: 'fun'

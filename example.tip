@@ -1,8 +1,12 @@
 numvar = 1
 stringvar = "aouea"
 fun() {}
+fun(a: p) : returnType {}
+var k : constructor <aa>
 var p = numvar + 30.11
-lambda = () {}
+lambda = (): p {}
+[1, 2]
+{ a: { "a" : b }}
 class Classy {
       public a() {}
       b() {}

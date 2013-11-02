@@ -2,10 +2,13 @@ start = statement+
 statement = ws s:(var / function / class / expression ) linechange
 	  { return s }
 
-var = 'var' s:symbol t:type? a:varAssingment?
+var = 'var' s:symbol t:type a:varAssingment?
     { return { type: 'var', name: s, typeExpression: t, assingment: a } }
 
-type = ':' ws t:typeExpression space
+type = t:type_?
+     { return t === '' ? undefined : t }
+
+type_ = ws ':' ws t:typeExpression space
      { return t }
 
 typeExpression = typeConstructor / typeStruct / typeFunction
@@ -43,8 +46,8 @@ typeArgumentTail = ',' t:typeExpression
 varAssingment = '=' e:expression
 	      { return e }
 
-function = i:symbol p:parameterList body:block
-	 { return { type: 'function', parameters: p, body: body, name: i} }
+function = i:symbol l:lambda
+	 { l.name = i; return l }
 
 block = ws '{' s:statement* '}' space
       { return s }
@@ -58,7 +61,7 @@ parameters = p:parameter ps:parameterListTail*
 parameterListTail = ',' p:parameter
 		  { return p }
 
-parameter = s:symbol t:type?
+parameter = s:symbol t:type
 	  { return { type: 'parameter', symbol: s, typeExpression: t === '' ? undefined : t } }
 
 symbol = ws i:[a-zA-Z_$] is:[a-zA-Z_0-9$]* space
@@ -105,8 +108,8 @@ parenthesis = '(' e:expression ')'
 
 terminal = literal / identifier
 
-lambda = ps:parameterList body:block
-       { return { type: 'function', parameters:ps, body: body }}
+lambda = ps:parameterList t:type body:block
+       { return { type: 'function', parameters:ps, body: body, typeExpression: t }}
 
 op = o:[.\-+*%/]+
    { return o.join('') }
