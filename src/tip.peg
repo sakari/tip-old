@@ -8,7 +8,16 @@ var = 'var' s:symbol t:type? a:varAssingment?
 type = ':' ws t:typeExpression ws
      { return t }
 
-typeExpression = typeConstructor / typeStruct
+typeExpression = typeConstructor / typeStruct / typeFunction
+
+typeFunction = '(' p:typeList? ')' ws '->' r:typeExpression
+	     { return { type: 'functionType', parameters: p === '' ? [] : p, returnType: r }}
+
+typeList = t:typeExpression tt:typeListTail*
+	 { return [t].concat(tt) }
+
+typeListTail = ',' t:typeExpression
+	     { return t }
 
 typeStruct = '{' t:typeFields? '}'
 	   { return { type: 'structType', fields: t } }

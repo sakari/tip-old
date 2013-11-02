@@ -51,6 +51,15 @@ describe('tip', function() {
 				  value: { type: 'constructorType', constructor: 'z', args: []}
 			      }]})
 	})
+
+	it('parses function types', function() {
+	    tip.parse('var a: (a) -> k')[0].typeExpression
+		.should.eql(
+		    { type: 'functionType'
+		      , parameters: [{ type: 'constructorType', constructor: 'a', args: [] }]
+		      , returnType: { type: 'constructorType', constructor: 'k', args: []}
+		    })
+	})
     })
 
     describe('literals', function() {
