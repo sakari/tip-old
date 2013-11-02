@@ -1,28 +1,83 @@
 start = statement+
-statement = ws s:(function / type / expression) ws { return s }
+statement = ws s:(function / type / expression) ws
+	  { return s }
 
-function = i:identifier '(' p:parameters? ')' ws '{' body:statement* '}' ws { return { type: 'function', parameters: p, body: body, name: i} }
-parameters = p:parameter (',' ps:parameters)* { return [p].concat[ps] }
+function = i:identifier p:parameterList body:block
+	 { return { type: 'function', parameters: p, body: body, name: i} }
+block = ws '{' s:statement* '}' ws
+      { return s }
+parameterList = '(' p:parameters? ')'
+	      { return p }
+parameters = p:parameter (',' ps:parameters)*
+	   { return [p].concat[ps] }
 parameter = identifier
 
-identifier = ws i:[a-zA-Z_$] is:[a-zA-Z_0-9$]* ws { return { type: 'identifier', name: i + is.join('')} }
+symbol = ws i:[a-zA-Z_$] is:[a-zA-Z_0-9$]* ws
+       { return i + is.join('')}
+
+identifier = s:symbol
+	   { return { type: 'identifier', name: s } }
 
 type = class
-class = 'class' i:identifier '{' ifs:interface* '}' { return { type: 'class', name: 'i', interfaces: ifs }}
-interface = ws p:('public')? i:(function / identifier) ws { return { visibility: p ? 'public' : 'private', interface: i}}
 
-arguments = e:expression (',' args:arguments)* { return [e].concat([args]) }
+class = 'class' i:identifier '{' ifs:interface* '}'
+      { return { type: 'class', name: 'i', interfaces: ifs }}
+interface = ws p:('public')? i:(function / identifier) ws
+	  { return { visibility: p ? 'public' : 'private', interface: i}}
 
-expression = ws e:(application / assingment / operation / terminal / parenthesis / lambda) ws { return e }
-application = t:terminal '(' args:arguments? ')' { return { type: 'application', callee: t, arguments: args }}
-assingment = t:terminal '=' e:expression { return { type: 'assingment', lhs: t, rhs: e }}
-operation = lhs: terminal op:op rhs:expression { return { type: 'operation', lhs: lhs, rhs: rhs, operation: op }}
-parenthesis = '(' e:expression ')' { return { type: 'parenthesis', expression: e }}
+arguments = e:expression (',' args:arguments)*
+	  { return [e].concat([args]) }
+
+expression = ws e:(application / assingment / operation / terminal / parenthesis / lambda / array / struct) ws
+	   { return e }
+
+application = t:terminal '(' args:arguments? ')'
+	    { return { type: 'application', callee: t, arguments: args }}
+
+assingment = t:terminal '=' e:expression
+	   { return { type: 'assingment', lhs: t, rhs: e }}
+
+operation = lhs: terminal op:op rhs:expression
+	  { return { type: 'operation', lhs: lhs, rhs: rhs, operation: op }}
+
+parenthesis = '(' e:expression ')'
+	    { return { type: 'parenthesis', expression: e }}
+
 terminal = literal / identifier
-lambda = '(' ps:parameters* ')' ws '{' body:statement* '}' { return { type: 'function', parameters:ps, body: body }}
-op = o:[.\-+*%/]+ { return o.join('') }
+
+lambda = ps:parameterList body:block
+       { return { type: 'function', parameters:ps, body: body }}
+
+op = o:[.\-+*%/]+
+   { return o.join('') }
 
 ws = [ \n\t]*
-literal = ws lit:(number / string) ws { return lit }
-number = v:[0-9]+ vs:('.' [0-9]+)? { return { type: 'number', value: v.concat(vs ? '.' + vs[1].join('') : []).join('') }}
-string = '"' string:([^"]*) '"' { return { type: 'string', value: string.join('') }}
+
+struct = '{' f:fields? '}'
+       { return { type: 'struct', value: f ? f : [] } }
+
+fields = f:field fs:fieldTail*
+       { return [f].concat(fs) }
+
+fieldTail = ',' f:field
+	  { return f }
+
+field = k:key ':' v:expression
+      { return {key: k, value: v} }
+
+key = symbol / string
+
+array = '[' e:expression es:expressionTail* ']'
+      { return { type: 'array', value: [e].concat(es)} }
+
+expressionTail = ',' e:expression
+	       { return e }
+
+literal = ws lit:(number / string) ws
+	{ return lit }
+
+number = v:[0-9]+ vs:('.' [0-9]+)?
+       { return { type: 'number', value: v.concat(vs ? '.' + vs[1].join('') : []).join('') } }
+
+string = '"' string:([^"]*) '"'
+       { return { type: 'string', value: string.join('') }}

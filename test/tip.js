@@ -20,6 +20,19 @@ describe('tip', function() {
 	it('parses string literals', function() {
 	    tip.parse('"aa aa"')[0].should.eql({ type: 'string', value: 'aa aa'})
 	})
+
+	it('parses array constructor', function() {
+	    tip.parse('[a, 2]')[0].should.eql({ type: 'array',
+						value: [{ type: 'identifier', name: 'a' }
+							, {type: 'number', value: '2'}
+						       ]})
+	})
+
+	it('parses structures', function() {
+	    tip.parse('{ a: 1}')[0]
+		.should.eql({ type: 'struct'
+			      , value: [ { key:  'a', value: { type: 'number', value: '1'}} ]})
+	})
     })
 
     it('parses operator expressions', function() {
