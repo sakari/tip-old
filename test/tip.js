@@ -26,6 +26,18 @@ describe('tip', function() {
 
     })
 
+    describe('functions', function() {
+	it('parses functions', function() {
+	    tip.parse('fun(a) {}')[0]
+		.should.eql({
+		    type: 'function',
+		    parameters: [{ type: 'parameter', symbol: 'a', typeExpression: undefined}],
+		    body: [],
+		    name: 'fun'
+		})
+	})
+    })
+
     describe('type expressions', function() {
 	it('parses constructor', function() {
 	    tip.parse('var a : number')[0].typeExpression
@@ -59,6 +71,11 @@ describe('tip', function() {
 		      , parameters: [{ type: 'constructorType', constructor: 'a', args: [] }]
 		      , returnType: { type: 'constructorType', constructor: 'k', args: []}
 		    })
+	})
+
+	it('parses type expressions in function parameters', function() {
+	    tip.parse('fun(a:k) {}')[0].parameters[0].typeExpression
+		.should.eql({ type: 'constructorType', constructor: 'k', args: []})
 	})
     })
 

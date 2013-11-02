@@ -45,13 +45,21 @@ varAssingment = '=' e:expression
 
 function = i:symbol p:parameterList body:block
 	 { return { type: 'function', parameters: p, body: body, name: i} }
+
 block = ws '{' s:statement* '}' ws
       { return s }
+
 parameterList = '(' p:parameters? ')'
-	      { return p }
-parameters = p:parameter (',' ps:parameters)*
-	   { return [p].concat[ps] }
-parameter = identifier
+	      { return p === '' ? [] : p }
+
+parameters = p:parameter ps:parameterListTail*
+	   { return [p].concat(ps) }
+
+parameterListTail = ',' p:parameter
+		  { return p }
+
+parameter = s:symbol t:type?
+	  { return { type: 'parameter', symbol: s, typeExpression: t === '' ? undefined : t } }
 
 symbol = ws i:[a-zA-Z_$] is:[a-zA-Z_0-9$]* ws
        { return i + is.join('')}
@@ -61,11 +69,15 @@ identifier = s:symbol
 
 class = 'class' i:symbol '{' ifs:interface* '}'
       { return { type: 'class', name: 'i', interfaces: ifs }}
+
 interface = ws p:('public')? i:(function / identifier) ws
 	  { return { visibility: p ? 'public' : 'private', interface: i}}
 
-arguments = e:expression (',' args:arguments)*
+arguments = e:expression args:argumentTail*
 	  { return [e].concat([args]) }
+
+argumentTail = ',' e:expression
+	     { return e }
 
 expression = ws e:(application / assingment / operation / terminal / parenthesis / lambda / array / struct) ws
 	   { return e }
