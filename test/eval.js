@@ -15,6 +15,6 @@ describe('compile', function() {
     }
 
     it('produces evaluable code', function() {
-	evaluate('fixtures/test.tip', 1).should.eql(2)
+	evaluate('fixtures/test.tip', 1).should.eql(6)
     })
 })

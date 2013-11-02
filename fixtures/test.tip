@@ -3,9 +3,13 @@ addOne(k: number) {
 }
 
 class Foo {
-    public square(a) {
-      	return a * a
+    constructor(by: number) {
+	this.by = by
+    }
+
+    public multiply(a) {
+      	return a * this.by
     }
 }
 
-new Foo().square(addOne(arg))
+new Foo(3).multiply(addOne(arg))

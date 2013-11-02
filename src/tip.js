@@ -45,10 +45,25 @@ Tip.prototype.transpileStatement = function(ast) {
     }
 
     if(ast.type === 'class') {
+	var constructor = ast.interfaces.filter(function(i) {
+	    return i.interface.name === 'constructor'
+	})[0]
+
+	var constructorBody = constructor ?
+	    constructor.interface.body.map(function(p) {
+		return self.transpileStatement(p)
+	    }).join('\n') : ''
+	var constructorArgs = constructor ?
+	    constructor.interface.parameters.map(function(p) {
+		return p.symbol
+	    }).join(', ') : ''
+
 	return this.templates['class']({
 	    name: ast.name,
+	    constructorArgs: constructorArgs,
+	    constructorBody: constructorBody,
 	    methods: ast.interfaces.filter(function(i) {
-		return i.interface.type === 'function'
+		return i.interface.type === 'function' && i.interface.name !== 'constructor'
 	    }).map(function(i) {
 		i = i.interface
 		return {
@@ -78,6 +93,12 @@ Tip.prototype.transpileExpression = function(ast) {
 
     if(ast.type === 'new') {
 	return 'new ' + this.transpileExpression(ast.expression)
+    }
+
+    if(ast.type === 'assingment') {
+	return this.transpileExpression(ast.lhs) +
+	    ' = ' +
+	    this.transpileExpression(ast.rhs)
     }
 
     if(ast.type === 'identifier') {
