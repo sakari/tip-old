@@ -29,7 +29,12 @@ describe('tip', function() {
     describe('type expressions', function() {
 	it('parses simple', function() {
 	    tip.parse('var a : number')[0].typeExpression
-		.should.eql({ constructor: 'number' })
+		.should.eql({ constructor: 'number', args: [] })
+	})
+
+	it('parses type expression with arguments', function() {
+	    tip.parse('var a : k<p>')[0].typeExpression
+		.should.eql({ constructor: 'k', args: [{constructor: 'p', args: []}]})
 	})
 
     })

@@ -8,8 +8,14 @@ var = 'var' s:symbol t:type? a:varAssingment?
 type = ':' ws t:typeExpression ws
      { return t }
 
-typeExpression = s:symbol
-	       { return { constructor: s}}
+typeExpression = s:symbol a:typeArguments?
+	       { return { constructor: s, args: a === '' ? [] : a }}
+
+typeArguments = '<' t:typeExpression ts:typeArgumentTail* '>'
+	 { return [t].concat(ts) }
+
+typeArgumentTail = ',' t:typeExpression
+	    { return t }
 
 varAssingment = '=' e:expression
 	      { return e }
