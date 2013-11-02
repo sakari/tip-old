@@ -65,7 +65,7 @@ fieldTail = ',' f:field
 field = k:key ':' v:expression
       { return {key: k, value: v} }
 
-key = symbol / string
+key = symbol / stringSymbol
 
 array = '[' e:expression es:expressionTail* ']'
       { return { type: 'array', value: [e].concat(es)} }
@@ -79,5 +79,8 @@ literal = ws lit:(number / string) ws
 number = v:[0-9]+ vs:('.' [0-9]+)?
        { return { type: 'number', value: v.concat(vs ? '.' + vs[1].join('') : []).join('') } }
 
-string = '"' string:([^"]*) '"'
-       { return { type: 'string', value: string.join('') }}
+string = s:stringSymbol
+       { return { type: 'string', value: s }}
+
+stringSymbol = ws '"' s:([^"]*) '"' ws
+	     { return s.join('') }

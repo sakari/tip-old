@@ -33,6 +33,11 @@ describe('tip', function() {
 		.should.eql({ type: 'struct'
 			      , value: [ { key:  'a', value: { type: 'number', value: '1'}} ]})
 	})
+
+	it('parses structures with string keys', function() {
+	    tip.parse('{ "aa": 1}')[0].value[0].key
+		.should.eql("aa")
+	})
     })
 
     it('parses operator expressions', function() {
