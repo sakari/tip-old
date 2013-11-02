@@ -14,3 +14,7 @@ class Classy {
       b() {}
       identifier
 }
+
+fun() {
+}
+class Bar {}

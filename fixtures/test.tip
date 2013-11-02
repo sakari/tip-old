@@ -1,5 +1,11 @@
 addOne(k: number) {
-     return k + 1
+    return k + 1
 }
 
-addOne(arg)
+class Foo {
+    public square(a) {
+      	return a * a
+    }
+}
+
+new Foo().square(addOne(arg))
