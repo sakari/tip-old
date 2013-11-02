@@ -1,0 +1,5 @@
+addOne(k: number) {
+     return k + 1
+}
+
+addOne(arg)

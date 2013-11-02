@@ -4,7 +4,9 @@ fun() {}
 fun(a: p) : returnType {}
 var k : constructor <aa>
 var p = numvar + 30.11
-lambda = (): p {}
+lambda = (): p {
+       return 1
+}
 [1, 2]
 { a: { "a" : b }}
 class Classy {

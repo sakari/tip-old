@@ -1,6 +1,9 @@
 start = statement+
-statement = ws s:(var / function / class / expression ) linechange
+statement = ws s:(var / function / class / return / expression ) linechange
 	  { return s }
+
+return = 'return' e:expression
+       { return { type: 'return', value: e }}
 
 var = 'var' s:symbol t:type a:varAssingment?
     { return { type: 'var', name: s, typeExpression: t, assingment: a } }
@@ -77,7 +80,7 @@ interface = ws p:('public')? i:(function / identifier) ws
 	  { return { visibility: p ? 'public' : 'private', interface: i}}
 
 arguments = e:expression args:argumentTail*
-	  { return [e].concat([args]) }
+	  { return [e].concat(args) }
 
 argumentTail = ',' e:expression
 	     { return e }
@@ -86,7 +89,7 @@ expressionOp = ws f:(opApplication / opAssingment / index / operation) space
 	     { return f }
 
 opApplication = '(' args:arguments? ')'
-	      { return function(t) { return { type: 'application', callee: t, arguments: args }} }
+	      { return function(t) { return { type: 'application', callee: t, arguments: args === '' ? [] : args }} }
 
 opAssingment = '=' e:expression
 	     { return function(lhs) { return { type: 'assingment', lhs: lhs, rhs: e }}}

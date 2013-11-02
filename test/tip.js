@@ -8,8 +8,7 @@ describe('tip', function() {
 	tip = new Tip()
     })
     it('parses the example file', function() {
-	console.log(JSON.stringify(
-	    tip.parse(fs.readFileSync('example.tip', 'utf8')), null, 4))
+	tip.parse(fs.readFileSync('example.tip', 'utf8'))
     })
 
     describe('variables', function() {
