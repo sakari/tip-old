@@ -14,15 +14,24 @@ describe('tip', function() {
 
     describe('variables', function() {
 	it('parses var', function() {
-	    tip.parse('var a')[0]
-		.should.eql({ type: 'var', name: 'a'});
+	    var p = tip.parse('var a')[0]
+		.should.include({type: 'var', name: 'a'})
 	})
 
 	it('allows assinging vars', function() {
 	    tip.parse('var a = 1')[0]
 		.assingment
-		.should.eql({ type: 'number', value: '1' })
+		.should.include({ type: 'number', value: '1' })
 	})
+
+    })
+
+    describe('type expressions', function() {
+	it('parses simple', function() {
+	    tip.parse('var a : number')[0].typeExpression
+		.should.eql({ constructor: 'number' })
+	})
+
     })
 
     describe('literals', function() {
@@ -54,8 +63,11 @@ describe('tip', function() {
     })
 
 
-    it('parses operator expressions', function() {
-	tip.parse('a * b')[0].operation.should.eql('*')
+
+    describe('expressions', function() {
+	it('parses operator expressions', function() {
+	    tip.parse('a * b')[0].operation.should.eql('*')
+	})
     })
 
     describe('interfaces', function() {

@@ -1,14 +1,20 @@
 start = statement+
-statement = ws s:(var / function / type / expression ) ws
+statement = ws s:(var / function / class / expression ) ws
 	  { return s }
 
-var = 'var' s:symbol a:varAssingment?
-    { var r = { type: 'var', name: s }; if(a !== '') r.assingment = a; return r }
+var = 'var' s:symbol t:type? a:varAssingment?
+    { return { type: 'var', name: s, typeExpression: t, assingment: a } }
+
+type = ':' ws t:typeExpression ws
+     { return t }
+
+typeExpression = s:symbol
+	       { return { constructor: s}}
 
 varAssingment = '=' e:expression
 	      { return e }
 
-function = i:identifier p:parameterList body:block
+function = i:symbol p:parameterList body:block
 	 { return { type: 'function', parameters: p, body: body, name: i} }
 block = ws '{' s:statement* '}' ws
       { return s }
@@ -24,9 +30,7 @@ symbol = ws i:[a-zA-Z_$] is:[a-zA-Z_0-9$]* ws
 identifier = s:symbol
 	   { return { type: 'identifier', name: s } }
 
-type = class
-
-class = 'class' i:identifier '{' ifs:interface* '}'
+class = 'class' i:symbol '{' ifs:interface* '}'
       { return { type: 'class', name: 'i', interfaces: ifs }}
 interface = ws p:('public')? i:(function / identifier) ws
 	  { return { visibility: p ? 'public' : 'private', interface: i}}
